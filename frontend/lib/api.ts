@@ -67,7 +67,14 @@ export const api = {
   areas: (id: number) => request<EnergyArea[]>(`/systems/${id}/areas`),
   energyUses: (id: number) => request<EnergyUse[]>(`/systems/${id}/energy-uses`),
   energyUseBaseYear: (id: number) => request<EnergyUseBaseYear[]>(`/systems/${id}/energy-use-base-year`),
-  energyUseBaseYearPareto: (id: number) => request<ParetoItem[]>(`/systems/${id}/energy-use-base-year/pareto`),
+  energyUseBaseYearPareto: (id: number, year?: number) => {
+    const params = new URLSearchParams();
+    if (year !== undefined && year !== null) {
+      params.set("year", String(year));
+    }
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    return request<ParetoItem[]>(`/systems/${id}/energy-use-base-year/pareto${suffix}`);
+  },
   significantEnergyUses: (id: number) => request<SignificantEnergyUse[]>(`/systems/${id}/significant-energy-uses`),
   significantEnergyUse: (id: number) => request<SignificantEnergyUse>(`/significant-energy-uses/${id}`),
   baselines: (id: number) => request<BaselineModel[]>(`/systems/${id}/baselines`),

@@ -11,6 +11,7 @@ from typing import Any, Iterable
 
 _INT_PATTERN = re.compile(r"^-?\d+$")
 _FLOAT_PATTERN = re.compile(r"^-?\d+\.\d+(?:[eE][-+]?\d+)?$")
+_COMMA_FLOAT_PATTERN = re.compile(r"^-?\d+,\d+(?:[eE][-+]?\d+)?$")
 
 
 class CSVRepository:
@@ -54,6 +55,11 @@ class CSVRepository:
         if _FLOAT_PATTERN.match(text):
             try:
                 return float(text)
+            except ValueError:
+                return text
+        if _COMMA_FLOAT_PATTERN.match(text):
+            try:
+                return float(text.replace(",", "."))
             except ValueError:
                 return text
         try:
@@ -180,4 +186,3 @@ class CSVRepository:
                 raise KeyError(f"{table_name}:{record_id} not found")
             self.write_all(table_name, rows)
             return updated
-

@@ -23,6 +23,36 @@ const tooltipStyle = {
   boxShadow: "0 16px 40px rgba(15,23,42,0.12)",
 };
 
+const tcalFormatter = new Intl.NumberFormat("es-CL", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+
+const percentageFormatter = new Intl.NumberFormat("es-CL", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+function normalizePercent(value: number | string | undefined | null): number {
+  if (value === undefined || value === null || value === "") {
+    return 0;
+  }
+  const numeric = typeof value === "string" ? Number(value.replace(",", ".")) : Number(value);
+  if (Number.isNaN(numeric)) {
+    return 0;
+  }
+  return Math.abs(numeric) <= 1 ? numeric * 100 : numeric;
+}
+
+function formatTcal(value: number | string | undefined | null): string {
+  const numeric = typeof value === "string" ? Number(value.replace(",", ".")) : Number(value ?? 0);
+  return `${tcalFormatter.format(Number.isFinite(numeric) ? numeric : 0)} tCal`;
+}
+
+function formatPercentage(value: number | string | undefined | null): string {
+  return `${percentageFormatter.format(normalizePercent(value))}%`;
+}
+
 export function ParetoChart({ data }: { data: ParetoItem[] }) {
   return (
     <div className="h-80 w-full">
@@ -30,9 +60,30 @@ export function ParetoChart({ data }: { data: ParetoItem[] }) {
         <ComposedChart data={data}>
           <CartesianGrid stroke="rgba(148,163,184,0.22)" strokeDasharray="3 3" />
           <XAxis dataKey="label" tick={{ fill: "#64748b", fontSize: 12 }} interval={0} angle={-12} textAnchor="end" height={70} />
-          <YAxis yAxisId="left" tick={{ fill: "#64748b", fontSize: 12 }} />
-          <YAxis yAxisId="right" orientation="right" tick={{ fill: "#64748b", fontSize: 12 }} domain={[0, 100]} />
-          <Tooltip contentStyle={tooltipStyle} />
+          <YAxis yAxisId="left" tick={{ fill: "#64748b", fontSize: 12 }} tickFormatter={(value) => tcalFormatter.format(Number(value))} />
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            tick={{ fill: "#64748b", fontSize: 12 }}
+            domain={[0, 100]}
+            tickFormatter={(value) => percentageFormatter.format(Number(value))}
+          />
+          <Tooltip
+            contentStyle={tooltipStyle}
+            formatter={(value, name) => {
+              if (name === "Consumo") {
+                return [formatTcal(value as number | string), name];
+              }
+              if (name === "% acumulado") {
+                return [formatPercentage(value as number | string), name];
+              }
+              return [String(value), String(name)];
+            }}
+            labelFormatter={(label, payload) => {
+              const year = payload?.[0]?.payload?.year;
+              return `${label}${year ? ` · ${year}` : ""}`;
+            }}
+          />
           <Legend />
           <Bar yAxisId="left" dataKey="value" fill="#0f766e" radius={[8, 8, 0, 0]} name="Consumo" />
           <Line yAxisId="right" type="monotone" dataKey="accumulated_percentage" stroke="#16a34a" strokeWidth={2.5} dot={false} name="% acumulado" />

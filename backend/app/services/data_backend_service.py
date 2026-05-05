@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Iterable
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -68,6 +69,11 @@ def _utcnow() -> datetime:
 def _as_float(value: Any) -> float | None:
     if value in (None, ""):
         return None
+    if isinstance(value, str):
+        text = value.strip().replace(",", ".")
+        if text == "":
+            return None
+        return float(text)
     return float(value)
 
 
@@ -225,16 +231,80 @@ class DataBackendService:
         items = self._filter("energy_use_base_year", energy_system_id=system_id)
         return sorted(items, key=lambda item: (-float(item.get("accumulated_percentage") or 0), -float(item.get("percentage") or 0), int(item.get("id") or 0)))
 
-    def pareto_energy_use_base_year(self, system_id: int) -> list[dict[str, Any]]:
-        return [
-            {
-                "label": item.get("installation_name") or item.get("area_name"),
-                "value": float(item.get("consumption_tcal") or item.get("consumption_value") or 0),
-                "percentage": float(item.get("percentage") or 0),
-                "accumulated_percentage": float(item.get("accumulated_percentage") or 0),
-            }
-            for item in self.list_energy_use_base_year(system_id)
-        ]
+    @staticmethod
+    def _normalize_percentage(value: Any) -> float:
+        percentage = _as_float(value) or 0.0
+        if abs(percentage) <= 1:
+            percentage *= 100
+        return round(percentage, 2)
+
+    def _pareto_rows_from_base_year(self, system_id: int) -> list[dict[str, Any]]:
+        rows = []
+        for item in self.list_energy_use_base_year(system_id):
+            value = _as_float(item.get("consumption_tcal") or item.get("consumption_value") or 0) or 0.0
+            rows.append(
+                {
+                    "year": int(item.get("base_year") or 2022),
+                    "label": item.get("installation_name") or item.get("area_name"),
+                    "value": value,
+                    "source": item.get("source") or "BNE 2022",
+                }
+            )
+        return rows
+
+    def _pareto_rows_from_bne(self, system_id: int, year: int | None = None) -> list[dict[str, Any]]:
+        rows = []
+        for item in self._filter("bne_energy_consumption", energy_system_id=system_id):
+            item_year = int(item.get("year") or 0)
+            if year is not None and item_year != year:
+                continue
+            if item_year == 2022:
+                continue
+            value = _as_float(item.get("energy_total_tcal") or item.get("energy_input_tcal") or item.get("energy_output_tcal") or 0) or 0.0
+            rows.append(
+                {
+                    "year": item_year,
+                    "label": item.get("area") or item.get("plant_name"),
+                    "value": value,
+                    "source": item.get("source") or f"BNE {item_year}",
+                }
+            )
+        return rows
+
+    def _build_pareto_rows(self, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        grouped: dict[int, list[dict[str, Any]]] = defaultdict(list)
+        for row in rows:
+            grouped[int(row["year"])].append(row)
+
+        output: list[dict[str, Any]] = []
+        for year in sorted(grouped):
+            year_rows = sorted(grouped[year], key=lambda item: (-float(item.get("value") or 0), str(item.get("label") or "")))
+            total = sum(float(item.get("value") or 0) for item in year_rows)
+            cumulative = 0.0
+            for item in year_rows:
+                value = float(item.get("value") or 0)
+                cumulative += value
+                percentage = round((value / total) * 100, 2) if total else 0.0
+                accumulated_percentage = round((cumulative / total) * 100, 2) if total else 0.0
+                output.append(
+                    {
+                        "year": year,
+                        "label": item.get("label"),
+                        "value": round(value, 3),
+                        "percentage": percentage,
+                        "accumulated_percentage": accumulated_percentage,
+                        "source": item.get("source"),
+                    }
+                )
+        return output
+
+    def pareto_energy_use_base_year(self, system_id: int, year: int | None = None) -> list[dict[str, Any]]:
+        self._require_system(system_id)
+        rows = self._pareto_rows_from_base_year(system_id)
+        rows.extend(self._pareto_rows_from_bne(system_id, year=year))
+        if year is not None:
+            rows = [item for item in rows if int(item["year"]) == year]
+        return self._build_pareto_rows(rows)
 
     def create_energy_use_base_year(self, system_id: int, payload: EnergyUseBaseYearCreate) -> dict[str, Any]:
         self._require_system(system_id)

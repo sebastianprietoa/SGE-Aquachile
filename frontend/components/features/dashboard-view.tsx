@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { api } from "@/lib/api";
 import type { AlertEvent, EnergySystem, ParetoItem, TrackingSummary, TrendPoint } from "@/types/api";
-import { AlertBadge, ComplianceStrip, KpiCard, PageHeader, SectionCard } from "@/components/energy/shared";
+import { AlertBadge, ComplianceStrip, DataTable, KpiCard, PageHeader, SectionCard } from "@/components/energy/shared";
 import { IdeComparisonChart, LineComparisonChart, ParetoChart } from "@/components/energy/charts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,26 @@ const severityVariant: Record<string, "default" | "success" | "warning" | "destr
   medium: "warning",
   low: "secondary",
 };
+
+const tcalFormatter = new Intl.NumberFormat("es-CL", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+
+const percentageFormatter = new Intl.NumberFormat("es-CL", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+function formatTcal(value: number): string {
+  return `${tcalFormatter.format(value)} tCal`;
+}
+
+function formatPercent(value: number | null | undefined): string {
+  const numeric = Number(value ?? 0);
+  const normalized = Math.abs(numeric) <= 1 ? numeric * 100 : numeric;
+  return `${percentageFormatter.format(normalized)}%`;
+}
 
 export function DashboardView({ systemId: forcedSystemId }: { systemId?: number } = {}) {
   const [systems, setSystems] = useState<EnergySystem[]>([]);
@@ -31,6 +51,7 @@ export function DashboardView({ systemId: forcedSystemId }: { systemId?: number 
   const [ideTrend, setIdeTrend] = useState<TrendPoint[]>([]);
   const [pareto, setPareto] = useState<ParetoItem[]>([]);
   const [alerts, setAlerts] = useState<AlertEvent[]>([]);
+  const [paretoYear, setParetoYear] = useState<number | null>(null);
 
   useEffect(() => {
     api.systems().then((items) => {
@@ -71,7 +92,24 @@ export function DashboardView({ systemId: forcedSystemId }: { systemId?: number 
     };
   }, [systemId]);
 
+  useEffect(() => {
+    if (!pareto.length) {
+      setParetoYear(null);
+      return;
+    }
+    const years = [...new Set(pareto.map((item) => item.year))].sort((a, b) => a - b);
+    setParetoYear((current) => {
+      if (current !== null && years.includes(current)) {
+        return current;
+      }
+      return years.includes(2022) ? 2022 : years[years.length - 1] ?? null;
+    });
+  }, [pareto]);
+
   const selectedSystem = useMemo(() => systems.find((item) => item.id === systemId) ?? systems[0] ?? null, [systemId, systems]);
+  const paretoYears = useMemo(() => [...new Set(pareto.map((item) => item.year))].sort((a, b) => a - b), [pareto]);
+  const selectedParetoData = useMemo(() => pareto.filter((item) => item.year === paretoYear), [pareto, paretoYear]);
+  const selectedParetoTotal = useMemo(() => selectedParetoData.reduce((sum, item) => sum + item.value, 0), [selectedParetoData]);
 
   if (!selectedSystem) {
     return <div className="rounded-3xl border border-slate-200 bg-white p-8 text-slate-600 shadow-sm">Cargando sistema energético...</div>;
@@ -160,8 +198,40 @@ export function DashboardView({ systemId: forcedSystemId }: { systemId?: number 
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <SectionCard title="Pareto de consumo BD 2022" description="Base para identificación de USE y priorización Art. 21.">
-          <ParetoChart data={pareto} />
+        <SectionCard
+          title="Pareto de consumo energético"
+          description={`Base para identificación de USE y priorización Art. 21. Año ${paretoYear ?? "--"} · Total ${formatTcal(selectedParetoTotal)}`}
+          actions={
+            <div className="flex flex-wrap items-center gap-3">
+              <Select value={paretoYear ? String(paretoYear) : ""} onChange={(event) => setParetoYear(Number(event.target.value))} className="min-w-[140px] bg-white">
+                {paretoYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              <Badge variant="secondary" className="rounded-full px-4 py-2">
+                {formatTcal(selectedParetoTotal)}
+              </Badge>
+            </div>
+          }
+        >
+          <div className="space-y-5">
+            <ParetoChart data={selectedParetoData} />
+            <DataTable
+              headers={["Área / instalación", "tCal", "% participación", "% acumulado", "Fuente"]}
+              rows={selectedParetoData.map((item) => [
+                item.label,
+                formatTcal(item.value),
+                formatPercent(item.percentage),
+                formatPercent(item.accumulated_percentage),
+                <span key={`${item.year}-${item.label}`} className="text-slate-500">
+                  {item.year === 2022 ? "BNE 2022" : `BNE ${item.year}`}
+                </span>,
+              ])}
+              emptyMessage="Sin datos para el año seleccionado."
+            />
+          </div>
         </SectionCard>
         <SectionCard title="Alertas recientes" description="Alertas generadas por desviación, datos incompletos o IDE fuera de rango.">
           <div className="space-y-3">

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import get_data_backend_service
 from app.schemas.energy_v2 import (
@@ -37,8 +37,12 @@ def get_energy_use_base_year(system_id: int, service: DataBackendService = Depen
 
 
 @router.get("/systems/{system_id}/energy-use-base-year/pareto", response_model=list[ParetoItem])
-def get_energy_use_base_year_pareto(system_id: int, service: DataBackendService = Depends(get_data_backend_service)) -> list[ParetoItem]:
-    return service.pareto_energy_use_base_year(system_id)
+def get_energy_use_base_year_pareto(
+    system_id: int,
+    year: int | None = Query(default=None, ge=1900),
+    service: DataBackendService = Depends(get_data_backend_service),
+) -> list[ParetoItem]:
+    return service.pareto_energy_use_base_year(system_id, year=year)
 
 
 @router.post("/systems/{system_id}/energy-use-base-year", response_model=EnergyUseBaseYearRead)
@@ -221,4 +225,3 @@ def put_operational_control(control_id: int, payload: OperationalControlUpdate, 
 @router.get("/systems/{system_id}/equipment-characterization", response_model=list[dict])
 def get_equipment_characterization(system_id: int, service: DataBackendService = Depends(get_data_backend_service)) -> list[dict]:
     return service.list_equipment_characterization(system_id)
-

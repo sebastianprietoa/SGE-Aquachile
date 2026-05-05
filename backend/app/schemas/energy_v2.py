@@ -411,6 +411,7 @@ class TrackingSummary(BaseModel):
 
 
 class ParetoItem(BaseModel):
+    year: int
     label: str
     value: float
     percentage: float
@@ -433,4 +434,3 @@ class DataCollectionPlanItem(BaseModel):
     min_value: float | None = None
     max_value: float | None = None
     active: bool = True
-

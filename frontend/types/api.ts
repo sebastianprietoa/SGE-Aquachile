@@ -445,6 +445,7 @@ export interface TrackingSummary {
 }
 
 export interface ParetoItem {
+  year: number;
   label: string;
   value: number;
   percentage: number;
