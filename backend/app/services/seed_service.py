@@ -164,7 +164,8 @@ def seed_database(db: Session) -> None:
         unit="kWh/ton",
         expected_range_min=0.5,
         expected_range_max=4.5,
-        alert_threshold_percentage=10,
+        warning_threshold_percentage=10,
+        critical_threshold_percentage=20,
         active=True,
     )
     aqua_ide = IdeDefinition(
@@ -180,7 +181,8 @@ def seed_database(db: Session) -> None:
         unit="kWh/ton",
         expected_range_min=0.4,
         expected_range_max=5.2,
-        alert_threshold_percentage=10,
+        warning_threshold_percentage=10,
+        critical_threshold_percentage=20,
         active=True,
     )
     db.add_all([elf_ide, aqua_ide])
@@ -270,4 +272,3 @@ def seed_database(db: Session) -> None:
     )
 
     db.commit()
-

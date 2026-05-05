@@ -1,0 +1,4 @@
+id,username,full_name,email,role,active
+1,admin,Administrador SGE,admin@sge.local,admin,true
+2,gestor,Gestor Energético,gestor@sge.local,gestor_energetico,true
+3,viewer,Usuario Consulta,viewer@sge.local,viewer,true

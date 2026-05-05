@@ -1,0 +1,6 @@
+id,energy_system_id,base_year,area_id,area_name,installation_name,energy_source,use_category,consumption_value,consumption_unit,consumption_tcal,percentage,accumulated_percentage,difference_vs_latest_year,percentage_difference_vs_latest_year,is_candidate_use,is_significant_use,source,notes,active
+1,1,2022,1,Hollemberg,Hollemberg,MIXTO,Caldera GLP,26523,kWh,26.523,0.4966,0.4966,1.577,5.95,true,true,BNE 2022,,true
+2,1,2022,2,Centros Magallanes,Centros Magallanes,DIÉSEL,Generador Diésel,9216,kWh,9.216,0.1726,0.6692,0.584,6.34,true,true,BNE 2022,,true
+3,1,2022,3,Centros XI,Centros XI,MIXTO,Generador Diésel,8059,kWh,8.059,0.1509,0.8201,0.391,4.85,true,true,BNE 2022,,true
+4,1,2022,4,Planta Cardonal,Planta Cardonal,MIXTO,Planta de proceso,6666,kWh,6.666,0.1248,0.9449,-0.416,-6.24,true,false,BNE 2022,,true
+5,1,2022,5,Centros X,Centros X,MIXTO,Soporte operacional,2945,kWh,2.945,0.0551,1.0,-0.245,-8.32,false,false,BNE 2022,,true

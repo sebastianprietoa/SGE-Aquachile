@@ -11,7 +11,11 @@ from app.schemas.common import AlertSummary, DashboardKpis, DashboardResponse, P
 
 
 def get_dashboard_response(db: Session, system_id: int) -> DashboardResponse:
-    measurements = db.query(MonthlyMeasurement).filter(MonthlyMeasurement.energy_system_id == system_id).all()
+    measurements = (
+        db.query(MonthlyMeasurement)
+        .filter(MonthlyMeasurement.energy_system_id == system_id, MonthlyMeasurement.significant_energy_use_id.is_not(None))
+        .all()
+    )
     open_alerts = db.query(func.count(AlertEvent.id)).filter(AlertEvent.energy_system_id == system_id, AlertEvent.status == "open").scalar() or 0
     real_total = sum(float(item.real_consumption or 0) for item in measurements)
     expected_total = sum(float(item.expected_consumption or 0) for item in measurements)
@@ -69,7 +73,11 @@ def get_dashboard_response(db: Session, system_id: int) -> DashboardResponse:
 
 
 def get_performance_summary(db: Session, system_id: int) -> PerformanceSummaryResponse:
-    measurements = db.query(MonthlyMeasurement).filter(MonthlyMeasurement.energy_system_id == system_id).all()
+    measurements = (
+        db.query(MonthlyMeasurement)
+        .filter(MonthlyMeasurement.energy_system_id == system_id, MonthlyMeasurement.significant_energy_use_id.is_not(None))
+        .all()
+    )
     total = len(measurements)
     compliant = sum(1 for item in measurements if item.compliance_status == "compliant")
     warning = sum(1 for item in measurements if item.compliance_status == "warning")
@@ -88,7 +96,11 @@ def get_performance_summary(db: Session, system_id: int) -> PerformanceSummaryRe
 
 
 def get_monthly_trends(db: Session, system_id: int) -> list[TrendPoint]:
-    measurements = db.query(MonthlyMeasurement).filter(MonthlyMeasurement.energy_system_id == system_id).all()
+    measurements = (
+        db.query(MonthlyMeasurement)
+        .filter(MonthlyMeasurement.energy_system_id == system_id, MonthlyMeasurement.significant_energy_use_id.is_not(None))
+        .all()
+    )
     grouped: dict[int, list[MonthlyMeasurement]] = defaultdict(list)
     for measurement in measurements:
         grouped[measurement.month].append(measurement)
@@ -102,4 +114,3 @@ def get_monthly_trends(db: Session, system_id: int) -> list[TrendPoint]:
         )
         for month, items in sorted(grouped.items())
     ]
-

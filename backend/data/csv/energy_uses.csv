@@ -1,0 +1,10 @@
+id,energy_system_id,area_id,name,energy_source,description,is_significant,active
+1,1,1,Piscicultura Hollemberg - Caldera GLP,GLP,Uso energético de caldera GLP,true,true
+2,1,1,Piscicultura Hollemberg - Generador GLP,GLP,Uso energético de generador GLP,true,true
+3,1,1,Piscicultura Hollemberg - Generador Diésel,Petróleo Diésel,Uso energético de generador diésel,true,true
+4,1,2,Centros XII AquaChile Magallanes - Generador Diésel,Petróleo Diésel,Uso energético de generador diésel,true,true
+5,1,2,Centros XII AquaChile Magallanes - Blower Electricidad,Electricidad,Uso energético de blower eléctrico,true,true
+6,1,3,Centros XI Empresas AquaChile - Generador Diésel,Petróleo Diésel,Uso energético de generador diésel,true,true
+7,1,3,Centros XI Empresas AquaChile - Blower Electricidad,Electricidad,Uso energético de blower eléctrico,true,true
+8,1,4,Planta Cardonal - Proceso,MIXTO,Uso energético de proceso,false,true
+9,1,5,Centros X - Soporte,MIXTO,Uso energético de soporte,false,true

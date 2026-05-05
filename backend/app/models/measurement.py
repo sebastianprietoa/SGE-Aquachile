@@ -37,6 +37,7 @@ class MonthlyMeasurement(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     energy_system_id: Mapped[int] = mapped_column(ForeignKey("energy_systems.id", ondelete="CASCADE"), index=True, nullable=False)
+    significant_energy_use_id: Mapped[int | None] = mapped_column(ForeignKey("significant_energy_uses.id", ondelete="SET NULL"), index=True, nullable=True)
     area_id: Mapped[int] = mapped_column(ForeignKey("energy_areas.id", ondelete="CASCADE"), index=True, nullable=False)
     energy_use_id: Mapped[int] = mapped_column(ForeignKey("energy_uses.id", ondelete="CASCADE"), index=True, nullable=False)
     baseline_model_id: Mapped[int] = mapped_column(ForeignKey("baseline_models.id", ondelete="CASCADE"), index=True, nullable=False)
@@ -61,6 +62,7 @@ class MonthlyMeasurement(Base):
     energy_system = relationship("EnergySystem", back_populates="measurements")
     area = relationship("EnergyArea")
     energy_use = relationship("EnergyUse")
+    significant_energy_use = relationship("SignificantEnergyUse")
     baseline_model = relationship("BaselineModel", back_populates="measurements")
     ide_definition = relationship("IdeDefinition", back_populates="measurements")
     created_by_user = relationship("User", foreign_keys=[created_by])
@@ -80,6 +82,7 @@ class MonthlyMeasurementVariable(Base):
     monthly_measurement_id: Mapped[int] = mapped_column(ForeignKey("monthly_measurements.id", ondelete="CASCADE"), index=True, nullable=False)
     baseline_variable_id: Mapped[int] = mapped_column(ForeignKey("baseline_variables.id", ondelete="RESTRICT"), index=True, nullable=False)
     variable_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    variable_code: Mapped[str | None] = mapped_column(String(120), nullable=True)
     value: Mapped[float] = mapped_column(Float, nullable=False)
     unit: Mapped[str | None] = mapped_column(String(50), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
@@ -123,4 +126,3 @@ class AlertEvent(Base):
     energy_system = relationship("EnergySystem")
     measurement = relationship("MonthlyMeasurement", back_populates="alerts")
     alert_rule = relationship("AlertRule", back_populates="alert_events")
-

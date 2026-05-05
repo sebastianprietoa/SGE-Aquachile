@@ -1,0 +1,6 @@
+id,energy_system_id,name,type,area_name,area_type,company,region,description,active
+1,1,Hollemberg,Piscicultura,Hollemberg,Piscicultura,AquaChile Magallanes,Región de Magallanes,Piscicultura Hollemberg,true
+2,1,Centros Magallanes,Centros de engorda,Centros Magallanes,Centros de engorda,AquaChile Magallanes,Región de Magallanes,Centros de engorda Magallanes,true
+3,1,Centros XI,Centros de engorda,Centros XI,Centros de engorda,Empresas AquaChile,Región de Aysén,Centros de engorda Empresas AquaChile,true
+4,1,Planta Cardonal,Planta de proceso,Planta Cardonal,Planta de proceso,Empresas AquaChile,Región de Los Lagos,Planta de procesos Cardonal,true
+5,1,Centros X,Centros de engorda,Centros X,Centros de engorda,Empresas AquaChile,Región de Los Lagos,Centros de engorda Región de Los Lagos,true

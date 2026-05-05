@@ -1,0 +1,11 @@
+id,energy_system_id,year,company,area,plant_name,region,energy_source,transaction_category,quantity_input,quantity_output,unit,conversion_factor,energy_input_tcal,energy_output_tcal,energy_total_tcal,energy_total_kwh,source
+1,1,2022,AquaChile Magallanes,Hollemberg,Hollemberg,Región de Magallanes,MIXTO,Consumo base,26523,26523,tcal,1.0,26.523,26.523,26.523,30846804,BNE 2022
+2,1,2022,AquaChile Magallanes,Centros Magallanes,Centros Magallanes,Región de Magallanes,DIÉSEL,Consumo base,9216,9216,tcal,1.0,9.216,9.216,9.216,10718473,BNE 2022
+3,1,2022,Empresas AquaChile,Centros XI,Centros XI,Región de Aysén,MIXTO,Consumo base,8059,8059,tcal,1.0,8.059,8.059,8.059,9370000,BNE 2022
+4,1,2022,Empresas AquaChile,Planta Cardonal,Planta Cardonal,Región de Los Lagos,MIXTO,Consumo base,6666,6666,tcal,1.0,6.666,6.666,6.666,7750000,BNE 2022
+5,1,2022,Empresas AquaChile,Centros X,Centros X,Región de Los Lagos,MIXTO,Consumo base,2945,2945,tcal,1.0,2.945,2.945,2.945,3420000,BNE 2022
+6,1,2024,AquaChile Magallanes,Hollemberg,Hollemberg,Región de Magallanes,MIXTO,Actualización,28100,28100,tcal,1.0,28.1,28.1,28.1,32643800,BNE 2024
+7,1,2024,AquaChile Magallanes,Centros Magallanes,Centros Magallanes,Región de Magallanes,DIÉSEL,Actualización,9800,9800,tcal,1.0,9.8,9.8,9.8,11390000,BNE 2024
+8,1,2024,Empresas AquaChile,Centros XI,Centros XI,Región de Aysén,MIXTO,Actualización,8450,8450,tcal,1.0,8.45,8.45,8.45,9815000,BNE 2024
+9,1,2024,Empresas AquaChile,Planta Cardonal,Planta Cardonal,Región de Los Lagos,MIXTO,Actualización,6250,6250,tcal,1.0,6.25,6.25,6.25,7264000,BNE 2024
+10,1,2024,Empresas AquaChile,Centros X,Centros X,Región de Los Lagos,MIXTO,Actualización,2700,2700,tcal,1.0,2.7,2.7,2.7,3138000,BNE 2024

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     app_name: str = "SGE Aquachile"
     api_v1_prefix: str = ""
     environment: str = "development"
+    data_backend: str = Field(default="csv", alias="DATA_BACKEND")
     database_url: str = Field(default="sqlite:///./sge_aquachile.db", alias="DATABASE_URL")
     secret_key: str = Field(default="change-me", alias="SECRET_KEY")
     algorithm: str = "HS256"
@@ -28,4 +29,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
