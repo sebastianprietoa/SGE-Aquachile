@@ -5,7 +5,9 @@ import type {
   BaselineModel,
   BaselineVariable,
   DashboardResponse,
+  DataCollectionPlanItem,
   EnergyArea,
+  EnergyUseBaseYear,
   EnergySystem,
   EnergyUse,
   IdeDefinition,
@@ -14,10 +16,15 @@ import type {
   MonthlyMeasurementUpdatePayload,
   PerformanceSummaryResponse,
   TrendPoint,
+  TrackingMonthlyRow,
+  TrackingSummary,
+  SignificantEnergyUse,
+  OperationalControl,
   LoginResponse,
   LoginRequest,
   MeasurementAuditLog,
   MonthlyMeasurementVariableInput,
+  ParetoItem,
 } from "@/types/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -59,10 +66,23 @@ export const api = {
   monthlyTrends: (id: number) => request<TrendPoint[]>(`/systems/${id}/monthly-trends`),
   areas: (id: number) => request<EnergyArea[]>(`/systems/${id}/areas`),
   energyUses: (id: number) => request<EnergyUse[]>(`/systems/${id}/energy-uses`),
+  energyUseBaseYear: (id: number) => request<EnergyUseBaseYear[]>(`/systems/${id}/energy-use-base-year`),
+  energyUseBaseYearPareto: (id: number) => request<ParetoItem[]>(`/systems/${id}/energy-use-base-year/pareto`),
+  significantEnergyUses: (id: number) => request<SignificantEnergyUse[]>(`/systems/${id}/significant-energy-uses`),
+  significantEnergyUse: (id: number) => request<SignificantEnergyUse>(`/significant-energy-uses/${id}`),
   baselines: (id: number) => request<BaselineModel[]>(`/systems/${id}/baselines`),
   baseline: (id: number) => request<BaselineModel>(`/baselines/${id}`),
   baselineVariables: (id: number) => request<BaselineVariable[]>(`/baselines/${id}/variables`),
   ides: (id: number) => request<IdeDefinition[]>(`/systems/${id}/ides`),
+  ide: (id: number) => request<IdeDefinition>(`/ides/${id}`),
+  systemTracking: (id: number) => request<TrackingMonthlyRow[]>(`/systems/${id}/tracking`),
+  systemTrackingSummary: (id: number) => request<TrackingSummary>(`/systems/${id}/tracking/summary`),
+  baselineTracking: (id: number) => request<TrackingMonthlyRow[]>(`/baselines/${id}/tracking`),
+  useTracking: (id: number) => request<TrackingMonthlyRow[]>(`/significant-energy-uses/${id}/tracking`),
+  dataCollectionPlan: (id: number) => request<DataCollectionPlanItem[]>(`/systems/${id}/data-collection-plan`),
+  baselineDataCollectionPlan: (id: number) => request<DataCollectionPlanItem[]>(`/baselines/${id}/data-collection-plan`),
+  operationalControls: (id: number) => request<OperationalControl[]>(`/systems/${id}/operational-controls`),
+  useOperationalControls: (id: number) => request<OperationalControl[]>(`/significant-energy-uses/${id}/operational-controls`),
   measurements: (systemId: number, query?: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams();
     Object.entries(query ?? {}).forEach(([key, value]) => {
@@ -87,4 +107,3 @@ export const api = {
   alertRules: (payload: AlertRule) => request<AlertRule>("/alert-rules", { method: "POST", body: JSON.stringify(payload) }),
   updateAlertRule: (id: number, payload: Partial<AlertRule>) => request<AlertRule>(`/alert-rules/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
 };
-

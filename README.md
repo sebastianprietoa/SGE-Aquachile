@@ -143,6 +143,34 @@ percentage_difference = difference / expected_consumption * 100
 
 ## Ejecución local
 
+### Modo CSV local
+
+Para desarrollo local rápido, la aplicación usa CSV como backend de datos.
+
+```bash
+cd backend
+python -m app.utils.seed_csv --reset
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+En otra terminal:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Abrir:
+
+```text
+http://localhost:3000
+```
+
+Variables relevantes:
+
+- `DATA_BACKEND=csv`
+- Los CSV quedan en `backend/data/csv/`
+
 ### Con Docker
 
 ```bash
@@ -196,4 +224,3 @@ pytest
 - Las variables permitidas se restringen por línea base.
 - Cada edición deja trazabilidad en `MeasurementAuditLog`.
 - Los registros aprobados no dependen de cambios automáticos de la línea base.
-
